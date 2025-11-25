@@ -399,6 +399,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Voice Practice / Speech Evaluation Route
+  app.post("/api/evaluate-speech", requireRole(["student"]), upload.single("audio"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No audio file provided" });
+      }
+
+      const { testType } = req.body;
+
+      // Check if OpenAI is configured
+      if (!process.env.OPENAI_API_KEY) {
+        return res.status(503).json({ 
+          message: "AI evaluation unavailable - OpenAI API key not configured. Please add your OpenAI API key to use this feature." 
+        });
+      }
+
+      try {
+        // Transcribe audio
+        const { text: transcription } = await transcribeAudio(req.file.path);
+
+        // Get AI evaluation
+        const evaluation = await evaluateSpeech(transcription, testType || "OET");
+
+        // Clean up the uploaded file
+        fs.unlinkSync(req.file.path);
+
+        // Return evaluation results
+        res.json({
+          transcription,
+          overallScore: evaluation.overallScore,
+          pronunciationScore: evaluation.pronunciationScore,
+          fluencyScore: evaluation.fluencyScore,
+          vocabularyScore: evaluation.vocabularyScore,
+          grammarScore: evaluation.grammarScore,
+          feedback: evaluation.feedback,
+        });
+      } catch (error) {
+        // Clean up the uploaded file on error
+        if (fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+        throw error;
+      }
+    } catch (error: any) {
+      console.error("Error evaluating speech:", error);
+      res.status(500).json({ message: error.message || "Failed to evaluate speech" });
+    }
+  });
+
   // Admin routes
   app.get("/api/admin/users", requireRole(["admin"]), async (req, res) => {
     try {

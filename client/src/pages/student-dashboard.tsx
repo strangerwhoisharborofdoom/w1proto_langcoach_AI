@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
-import { Mic, Trophy, BarChart3, BookOpen, Flame, Star, Zap, Award, Lock, Heart, CheckCircle } from "lucide-react";
+import { Mic, Trophy, BarChart3, BookOpen, Flame, Star, Zap, Award, Lock, Heart, CheckCircle, GraduationCap, Briefcase, Stethoscope } from "lucide-react";
 import type { Assignment, Submission } from "@shared/schema";
 
 interface AchievementBadge {
@@ -17,6 +18,8 @@ interface AchievementBadge {
 }
 
 export default function StudentDashboard() {
+  const [selectedTestType, setSelectedTestType] = useState<string>("OET");
+
   const { data: assignments = [] } = useQuery<Assignment[]>({
     queryKey: ["/api/assignments/student"],
   });
@@ -27,6 +30,33 @@ export default function StudentDashboard() {
 
   const completedCount = submissions.length;
   const pendingCount = submissions.filter((s) => s.status === "pending").length;
+
+  const testTypes = [
+    {
+      id: "OET",
+      name: "OET",
+      description: "For medical professionals: nursing, pharmacy, doctors",
+      icon: <Stethoscope className="h-6 w-6" />,
+      color: "bg-[#ff4b4b]",
+      borderColor: "border-[#ff4b4b]"
+    },
+    {
+      id: "IELTS",
+      name: "IELTS",
+      description: "Academic & General Training",
+      icon: <GraduationCap className="h-6 w-6" />,
+      color: "bg-[#1cb0f6]",
+      borderColor: "border-[#1cb0f6]"
+    },
+    {
+      id: "Business",
+      name: "Business English",
+      description: "Professional communication skills",
+      icon: <Briefcase className="h-6 w-6" />,
+      color: "bg-[#ce82ff]",
+      borderColor: "border-[#ce82ff]"
+    }
+  ];
 
   // Mock achievements data
   const achievements: AchievementBadge[] = [
@@ -144,6 +174,52 @@ export default function StudentDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Test Type Selector */}
+      <Card className="border-2">
+        <CardHeader>
+          <CardTitle className="text-2xl">Choose Your Test Type</CardTitle>
+          <CardDescription>Select the exam you're preparing for</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-3">
+            {testTypes.map((testType) => (
+              <Card
+                key={testType.id}
+                className={`cursor-pointer border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+                  selectedTestType === testType.id
+                    ? `${testType.borderColor} bg-gradient-to-br from-white to-gray-50 shadow-lg scale-105`
+                    : "hover:border-primary/50"
+                }`}
+                onClick={() => setSelectedTestType(testType.id)}
+                data-testid={`card-test-type-${testType.id.toLowerCase()}`}
+              >
+                <CardContent className="pt-6">
+                  <div className="flex flex-col items-center text-center gap-3">
+                    <div
+                      className={`p-4 rounded-full ${testType.color} text-white shadow-md`}
+                    >
+                      {testType.icon}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg">{testType.name}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {testType.description}
+                      </p>
+                    </div>
+                    {selectedTestType === testType.id && (
+                      <Badge className="bg-[#58cc02] hover:bg-[#58cc02] text-white">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Selected
+                      </Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

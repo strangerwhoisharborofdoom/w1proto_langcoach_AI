@@ -20,7 +20,7 @@ export async function transcribeAudio(audioFilePath: string): Promise<{ text: st
 
   return {
     text: transcription.text,
-    duration: transcription.duration || 0,
+    duration: 0, // Duration not available in Whisper API response
   };
 }
 

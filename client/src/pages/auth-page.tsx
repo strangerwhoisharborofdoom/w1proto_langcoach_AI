@@ -56,7 +56,7 @@ export default function AuthPage() {
       );
       toast({
         title: "Account created!",
-        description: "Welcome to EvalAI.",
+        description: "Welcome to LangCoachAI.",
       });
     } catch (error: any) {
       toast({
@@ -76,7 +76,7 @@ export default function AuthPage() {
           <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary text-primary-foreground">
             <Mic className="h-6 w-6" />
           </div>
-          <h1 className="text-3xl font-bold">EvalAI</h1>
+          <h1 className="text-3xl font-bold">LangCoachAI</h1>
           <p className="text-muted-foreground text-center">
             AI-Powered Language Evaluation Platform
           </p>
@@ -135,7 +135,7 @@ export default function AuthPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Create Account</CardTitle>
-                <CardDescription>Sign up to get started with EvalAI</CardDescription>
+                <CardDescription>Sign up to get started with LangCoachAI</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleRegister} className="space-y-4">

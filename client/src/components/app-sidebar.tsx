@@ -43,6 +43,7 @@ export function AppSidebar() {
   const studentMenuItems = [
     { title: "Dashboard", url: "/student", icon: LayoutDashboard },
     { title: "My Tests", url: "/student/tests", icon: Mic },
+    { title: "Speaking Test", url: "/student/voice-practice", icon: Mic },
     { title: "Mock Tests", url: "/student/mock-tests", icon: Trophy },
     { title: "Leaderboard", url: "/student/leaderboard", icon: Trophy },
     { title: "Results", url: "/student/results", icon: BarChart3 },
@@ -80,7 +81,7 @@ export function AppSidebar() {
             <Mic className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">EvalAI</h2>
+            <h2 className="text-lg font-semibold">LangCoachAI</h2>
             <p className="text-xs text-muted-foreground capitalize">{user?.role}</p>
           </div>
         </div>

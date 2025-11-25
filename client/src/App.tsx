@@ -18,6 +18,7 @@ import StudentTest from "@/pages/student-test";
 import StudentTests from "@/pages/student-tests";
 import StudentResults from "@/pages/student-results";
 import StudentLeaderboard from "@/pages/student-leaderboard";
+import StudentVoicePractice from "@/pages/student-voice-practice";
 import PlaceholderPage from "@/pages/placeholder-page";
 
 function ProtectedRoute({
@@ -111,6 +112,9 @@ function Router() {
       </Route>
       <Route path="/student/tests/:id">
         <ProtectedRoute component={StudentTest} allowedRoles={["student"]} />
+      </Route>
+      <Route path="/student/voice-practice">
+        <ProtectedRoute component={StudentVoicePractice} allowedRoles={["student"]} />
       </Route>
       <Route path="/student/mock-tests">
         <ProtectedRoute
