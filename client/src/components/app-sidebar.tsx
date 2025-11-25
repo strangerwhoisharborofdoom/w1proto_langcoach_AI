@@ -44,6 +44,7 @@ export function AppSidebar() {
     { title: "Dashboard", url: "/student", icon: LayoutDashboard },
     { title: "My Tests", url: "/student/tests", icon: Mic },
     { title: "Mock Tests", url: "/student/mock-tests", icon: Trophy },
+    { title: "Leaderboard", url: "/student/leaderboard", icon: Trophy },
     { title: "Results", url: "/student/results", icon: BarChart3 },
     { title: "Resources", url: "/student/resources", icon: BookOpen },
   ];

@@ -17,6 +17,7 @@ import TeacherSubmissions from "@/pages/teacher-submissions";
 import StudentTest from "@/pages/student-test";
 import StudentTests from "@/pages/student-tests";
 import StudentResults from "@/pages/student-results";
+import StudentLeaderboard from "@/pages/student-leaderboard";
 import PlaceholderPage from "@/pages/placeholder-page";
 
 function ProtectedRoute({
@@ -119,6 +120,9 @@ function Router() {
       </Route>
       <Route path="/student/results">
         <ProtectedRoute component={StudentResults} allowedRoles={["student"]} />
+      </Route>
+      <Route path="/student/leaderboard">
+        <ProtectedRoute component={StudentLeaderboard} allowedRoles={["student"]} />
       </Route>
       <Route path="/student/resources">
         <ProtectedRoute
