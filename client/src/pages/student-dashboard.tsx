@@ -4,8 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
-import { Mic, Trophy, BarChart3, BookOpen, Flame, Star, Zap, Award } from "lucide-react";
+import { Mic, Trophy, BarChart3, BookOpen, Flame, Star, Zap, Award, Lock, Heart, CheckCircle } from "lucide-react";
 import type { Assignment, Submission } from "@shared/schema";
+
+interface AchievementBadge {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ReactNode;
+  earned: boolean;
+  color: string;
+}
 
 export default function StudentDashboard() {
   const { data: assignments = [] } = useQuery<Assignment[]>({
@@ -18,6 +27,58 @@ export default function StudentDashboard() {
 
   const completedCount = submissions.length;
   const pendingCount = submissions.filter((s) => s.status === "pending").length;
+
+  // Mock achievements data
+  const achievements: AchievementBadge[] = [
+    {
+      id: "first-steps",
+      name: "First Steps",
+      description: "Completed your first test",
+      icon: <CheckCircle className="h-8 w-8" />,
+      earned: true,
+      color: "bg-[#58cc02]"
+    },
+    {
+      id: "7-day-streak",
+      name: "7-Day Streak",
+      description: "Maintained a 7-day learning streak",
+      icon: <Flame className="h-8 w-8" />,
+      earned: true,
+      color: "bg-[#ff9600]"
+    },
+    {
+      id: "perfect-score",
+      name: "Perfect Score",
+      description: "Achieved 100% on a test",
+      icon: <Star className="h-8 w-8" />,
+      earned: true,
+      color: "bg-[#ffc800]"
+    },
+    {
+      id: "quick-learner",
+      name: "Quick Learner",
+      description: "Completed 5 tests in one week",
+      icon: <Zap className="h-8 w-8" />,
+      earned: false,
+      color: "bg-[#1cb0f6]"
+    },
+    {
+      id: "oet-master",
+      name: "OET Master",
+      description: "Passed all OET sections",
+      icon: <Heart className="h-8 w-8" />,
+      earned: false,
+      color: "bg-[#ff4b4b]"
+    },
+    {
+      id: "top-10",
+      name: "Top 10",
+      description: "Reached top 10 on leaderboard",
+      icon: <Trophy className="h-8 w-8" />,
+      earned: false,
+      color: "bg-[#ce82ff]"
+    }
+  ];
 
   return (
     <div className="space-y-6">
@@ -146,6 +207,96 @@ export default function StudentDashboard() {
           </Link>
         </Card>
       </div>
+
+      {/* Achievements/Badges Section */}
+      <Card className="border-2">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-2xl flex items-center gap-2">
+                <Award className="h-6 w-6 text-[#ffc800]" />
+                Achievements
+              </CardTitle>
+              <CardDescription>Unlock badges as you progress in your learning journey</CardDescription>
+            </div>
+            <Badge className="bg-[#58cc02] hover:bg-[#58cc02] text-white text-sm">
+              {achievements.filter(a => a.earned).length}/{achievements.length} Earned
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {achievements.map((achievement) => (
+              <Card
+                key={achievement.id}
+                className={`relative overflow-hidden transition-all duration-300 ${
+                  achievement.earned
+                    ? "border-2 hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] cursor-pointer"
+                    : "border border-dashed bg-gray-50 opacity-60"
+                }`}
+              >
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    {/* Icon Container */}
+                    <div className="relative">
+                      <div
+                        className={`p-4 rounded-full ${
+                          achievement.earned
+                            ? `${achievement.color} text-white shadow-lg`
+                            : "bg-gray-300 text-gray-500"
+                        } transition-all duration-300`}
+                      >
+                        {achievement.earned ? (
+                          achievement.icon
+                        ) : (
+                          <Lock className="h-8 w-8" />
+                        )}
+                      </div>
+                      {achievement.earned && (
+                        <div className="absolute -top-1 -right-1 bg-[#58cc02] rounded-full p-1 border-2 border-white shadow-md">
+                          <CheckCircle className="h-4 w-4 text-white fill-current" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Badge Info */}
+                    <div className="flex-1 min-w-0">
+                      <h3
+                        className={`font-bold text-base truncate ${
+                          achievement.earned ? "text-foreground" : "text-muted-foreground"
+                        }`}
+                      >
+                        {achievement.name}
+                      </h3>
+                      <p
+                        className={`text-sm mt-1 line-clamp-2 ${
+                          achievement.earned ? "text-muted-foreground" : "text-gray-400"
+                        }`}
+                      >
+                        {achievement.earned ? achievement.description : "Locked - Keep learning to unlock!"}
+                      </p>
+                      {achievement.earned && (
+                        <Badge 
+                          className="mt-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs"
+                        >
+                          +50 XP
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Shine effect for earned badges */}
+                  {achievement.earned && (
+                    <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                      <div className="absolute top-0 -left-full h-full w-1/2 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 animate-shine"></div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Available Assignments */}
       <Card className="border-2">
