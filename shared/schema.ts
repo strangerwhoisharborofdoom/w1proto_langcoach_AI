@@ -200,3 +200,117 @@ export type InsertTeacherFeedback = z.infer<typeof insertTeacherFeedbackSchema>;
 
 export type Resource = typeof resources.$inferSelect;
 export type InsertResource = z.infer<typeof insertResourceSchema>;
+
+// Gamification Tables
+
+// User Progress & Points
+export const userProgress = pgTable("user_progress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  totalPoints: integer("total_points").default(0).notNull(),
+  currentStreak: integer("current_streak").default(0).notNull(),
+  longestStreak: integer("longest_streak").default(0).notNull(),
+  lastActivityDate: timestamp("last_activity_date"),
+  level: integer("level").default(1).notNull(),
+  weeklyGoal: integer("weekly_goal").default(50).notNull(),
+  completedLessons: integer("completed_lessons").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Badges/Achievements
+export const badges = pgTable("badges", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  iconName: text("icon_name").notNull(), // Icon identifier (e.g., "trophy", "fire", "star")
+  category: text("category").notNull().$type<"streak" | "completion" | "achievement" | "milestone">(),
+  requirement: integer("requirement").notNull(), // Number required (e.g., 7 for 7-day streak)
+  points: integer("points").default(10).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// User Badges (earned badges)
+export const userBadges = pgTable("user_badges", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  badgeId: varchar("badge_id").notNull().references(() => badges.id),
+  earnedAt: timestamp("earned_at").defaultNow().notNull(),
+});
+
+// Activity Log
+export const activityLog = pgTable("activity_log", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  activityType: text("activity_type").notNull().$type<"lesson_completed" | "test_submitted" | "badge_earned" | "streak_milestone" | "level_up">(),
+  pointsEarned: integer("points_earned").default(0).notNull(),
+  metadata: jsonb("metadata"), // Additional data like submissionId, badgeId, etc.
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const userProgressRelations = relations(userProgress, ({ one, many }) => ({
+  user: one(users, {
+    fields: [userProgress.userId],
+    references: [users.id],
+  }),
+  activities: many(activityLog),
+  badges: many(userBadges),
+}));
+
+export const badgesRelations = relations(badges, ({ many }) => ({
+userBadges: many(userBadges),
+}));
+
+export const userBadgesRelations = relations(userBadges, ({ one }) => ({
+user: one(users, {
+  fields: [userBadges.userId],
+  references: [users.id],
+}),
+badge: one(badges, {
+  fields: [userBadges.badgeId],
+  references: [badges.id],
+}),
+}));
+
+export const activityLogRelations = relations(activityLog, ({ one }) => ({
+user: one(users, {
+  fields: [activityLog.userId],
+  references: [users.id],
+}),
+}));
+
+// Insert Schemas
+export const insertUserProgressSchema = createInsertSchema(userProgress).omit({
+id: true,
+createdAt: true,
+updatedAt: true,
+});
+
+export const insertBadgeSchema = createInsertSchema(badges).omit({
+id: true,
+createdAt: true,
+});
+
+export const insertUserBadgeSchema = createInsertSchema(userBadges).omit({
+id: true,
+earnedAt: true,
+});
+
+export const insertActivityLogSchema = createInsertSchema(activityLog).omit({
+id: true,
+createdAt: true,
+});
+
+// Types
+export type UserProgress = typeof userProgress.$inferSelect;
+export type InsertUserProgress = z.infer<typeof insertUserProgressSchema>;
+
+export type Badge = typeof badges.$inferSelect;
+export type InsertBadge = z.infer<typeof insertBadgeSchema>;
+
+export type UserBadge = typeof userBadges.$inferSelect;
+export type InsertUserBadge = z.infer<typeof insertUserBadgeSchema>;
+
+export type ActivityLog = typeof activityLog.$inferSelect;
+export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
+
